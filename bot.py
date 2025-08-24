@@ -1,6 +1,9 @@
 import re
 import requests
 import datetime
+import threading
+import os
+from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, MessageHandler, filters, ContextTypes
 
@@ -112,13 +115,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(f"{result}\n\n🎯 Remaining limit: {remaining}/{DAILY_LIMIT}")
 
-# --- START ---
-def main():
+# --- FLASK WEB SERVER (for deployment health check) ---
+app_web = Flask(__name__)
+
+@app_web.route("/")
+def home():
+    return "✅ Bot is running!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))
+    app_web.run(host="0.0.0.0", port=port)
+
+# --- START TELEGRAM BOT ---
+def start_bot():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    print("✅ Bot is running...")
+    print("✅ Telegram Bot is running...")
     app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    # Start Flask server in background thread
+    threading.Thread(target=run_flask).start()
+    # Start Telegram bot
+    start_bot()
