@@ -13,7 +13,7 @@ API_URLS = [
     "https://ravenxchecker.site/num.php?num={}",     # Primary API
     "http://xploide.site/Api.php?num={}"            # Secondary API (fallback)
 ]
-DAILY_LIMIT = 5
+DAILY_LIMIT = 50
 BOT_USERNAME = "bot"   # lowercase username for trigger matching
 GROUP_ID = -1003039258661   # your group ID
 
